@@ -4,7 +4,7 @@
 #
 Name     : rcssmin
 Version  : 1.0.6
-Release  : 10
+Release  : 11
 URL      : https://pypi.python.org/packages/source/r/rcssmin/rcssmin-1.0.6.tar.gz
 Source0  : https://pypi.python.org/packages/source/r/rcssmin/rcssmin-1.0.6.tar.gz
 Summary  : CSS Minifier
