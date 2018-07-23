@@ -4,24 +4,36 @@
 #
 Name     : rcssmin
 Version  : 1.0.6
-Release  : 11
-URL      : https://pypi.python.org/packages/source/r/rcssmin/rcssmin-1.0.6.tar.gz
-Source0  : https://pypi.python.org/packages/source/r/rcssmin/rcssmin-1.0.6.tar.gz
+Release  : 12
+URL      : https://files.pythonhosted.org/packages/e2/5f/852be8aa80d1c24de9b030cdb6532bc7e7a1c8461554f6edbe14335ba890/rcssmin-1.0.6.tar.gz
+Source0  : https://files.pythonhosted.org/packages/e2/5f/852be8aa80d1c24de9b030cdb6532bc7e7a1c8461554f6edbe14335ba890/rcssmin-1.0.6.tar.gz
 Summary  : CSS Minifier
 Group    : Development/Tools
-License  : Apache-2.0
+License  : Apache-2.0 BSD-3-Clause
+Requires: rcssmin-python3
+Requires: rcssmin-license
 Requires: rcssmin-python
-Requires: rcssmin-doc
+BuildRequires : buildreq-distutils3
 BuildRequires : pbr
 BuildRequires : pip
-BuildRequires : python-dev
 BuildRequires : python3-dev
 BuildRequires : setuptools
 
 %description
-These test inputs are originally taken from the YUI compressor suite
-(https://github.com/yui/yuicompressor/). The outputs (in the out/ directory) are
-my own.
+CSS Minifier
+        ==============
+        
+        RCSSmin is a CSS minifier.
+        
+        The minifier is based on the semantics of the `YUI compressor`_\, which itself
+        is based on `the rule list by Isaac Schlueter`_\.
+        
+        This module is a re-implementation aiming for speed instead of maximum
+        compression, so it can be used at runtime (rather than during a preprocessing
+        step). RCSSmin does syntactical compression only (removing spaces, comments
+        and possibly semicolons). It does not provide semantic compression (like
+        removing empty blocks, collapsing redundant properties etc). It does, however,
+        support various CSS hacks (by keeping them working as intended).
 
 %package doc
 Summary: doc components for the rcssmin package.
@@ -31,33 +43,68 @@ Group: Documentation
 doc components for the rcssmin package.
 
 
+%package license
+Summary: license components for the rcssmin package.
+Group: Default
+
+%description license
+license components for the rcssmin package.
+
+
 %package python
 Summary: python components for the rcssmin package.
 Group: Default
+Requires: rcssmin-python3
 
 %description python
 python components for the rcssmin package.
+
+
+%package python3
+Summary: python3 components for the rcssmin package.
+Group: Default
+Requires: python3-core
+
+%description python3
+python3 components for the rcssmin package.
 
 
 %prep
 %setup -q -n rcssmin-1.0.6
 
 %build
-python2 setup.py build -b py2
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost,127.0.0.1,0.0.0.0
+export LANG=C
+export SOURCE_DATE_EPOCH=1532377702
 python3 setup.py build -b py3
 
 %install
 rm -rf %{buildroot}
-python2 -tt setup.py build -b py2 install --root=%{buildroot}
+mkdir -p %{buildroot}/usr/share/doc/rcssmin
+cp LICENSE %{buildroot}/usr/share/doc/rcssmin/LICENSE
+cp bench/LICENSE.cssmin %{buildroot}/usr/share/doc/rcssmin/bench_LICENSE.cssmin
 python3 -tt setup.py build -b py3 install --root=%{buildroot}
+echo ----[ mark ]----
+cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
+echo ----[ mark ]----
 
 %files
 %defattr(-,root,root,-)
 
 %files doc
-%defattr(-,root,root,-)
+%defattr(0644,root,root,0755)
 %doc /usr/share/doc/rcssmin/*
+
+%files license
+%defattr(-,root,root,-)
+/usr/share/doc/rcssmin/LICENSE
+/usr/share/doc/rcssmin/bench_LICENSE.cssmin
 
 %files python
 %defattr(-,root,root,-)
-/usr/lib/python*/*
+
+%files python3
+%defattr(-,root,root,-)
+/usr/lib/python3*/*
