@@ -4,36 +4,101 @@
 #
 Name     : rcssmin
 Version  : 1.0.6
-Release  : 17
+Release  : 18
 URL      : https://files.pythonhosted.org/packages/e2/5f/852be8aa80d1c24de9b030cdb6532bc7e7a1c8461554f6edbe14335ba890/rcssmin-1.0.6.tar.gz
 Source0  : https://files.pythonhosted.org/packages/e2/5f/852be8aa80d1c24de9b030cdb6532bc7e7a1c8461554f6edbe14335ba890/rcssmin-1.0.6.tar.gz
 Summary  : CSS Minifier
 Group    : Development/Tools
 License  : Apache-2.0 BSD-3-Clause
-Requires: rcssmin-python3
-Requires: rcssmin-license
-Requires: rcssmin-python
+Requires: rcssmin-license = %{version}-%{release}
+Requires: rcssmin-python = %{version}-%{release}
+Requires: rcssmin-python3 = %{version}-%{release}
 BuildRequires : buildreq-distutils3
-BuildRequires : pbr
-BuildRequires : pip
-BuildRequires : python3-dev
-BuildRequires : setuptools
 
 %description
-CSS Minifier
-        ==============
-        
-        RCSSmin is a CSS minifier.
-        
-        The minifier is based on the semantics of the `YUI compressor`_\, which itself
-        is based on `the rule list by Isaac Schlueter`_\.
-        
-        This module is a re-implementation aiming for speed instead of maximum
-        compression, so it can be used at runtime (rather than during a preprocessing
-        step). RCSSmin does syntactical compression only (removing spaces, comments
-        and possibly semicolons). It does not provide semantic compression (like
-        removing empty blocks, collapsing redundant properties etc). It does, however,
-        support various CSS hacks (by keeping them working as intended).
+==============
+ CSS Minifier
+==============
+
+RCSSmin is a CSS minifier.
+
+The minifier is based on the semantics of the `YUI compressor`_\, which itself
+is based on `the rule list by Isaac Schlueter`_\.
+
+This module is a re-implementation aiming for speed instead of maximum
+compression, so it can be used at runtime (rather than during a preprocessing
+step). RCSSmin does syntactical compression only (removing spaces, comments
+and possibly semicolons). It does not provide semantic compression (like
+removing empty blocks, collapsing redundant properties etc). It does, however,
+support various CSS hacks (by keeping them working as intended).
+
+Here's a feature list:
+
+- Strings are kept, except that escaped newlines are stripped
+- Space/Comments before the very end or before various characters are
+  stripped: ``:{});=>],!`` (The colon (``:``) is a special case, a single
+  space is kept if it's outside a ruleset.)
+- Space/Comments at the very beginning or after various characters are
+  stripped: ``{}(=:>[,!``
+- Optional space after unicode escapes is kept, resp. replaced by a simple
+  space
+- whitespaces inside ``url()`` definitions are stripped
+- Comments starting with an exclamation mark (``!``) can be kept optionally.
+- All other comments and/or whitespace characters are replaced by a single
+  space.
+- Multiple consecutive semicolons are reduced to one
+- The last semicolon within a ruleset is stripped
+- CSS Hacks supported:
+
+  - IE7 hack (``>/**/``)
+  - Mac-IE5 hack (``/*\*/.../**/``)
+  - The boxmodelhack is supported naturally because it relies on valid CSS2
+    strings
+  - Between ``:first-line`` and the following comma or curly brace a space is
+    inserted. (apparently it's needed for IE6)
+  - Same for ``:first-letter``
+
+rcssmin.c is a reimplementation of rcssmin.py in C and improves runtime up to
+factor 100 or so (depending on the input). docs/BENCHMARKS in the source
+distribution contains the details.
+
+Both python 2 (>= 2.4) and python 3 are supported.
+
+.. _YUI compressor: https://github.com/yui/yuicompressor/
+
+.. _the rule list by Isaac Schlueter: https://github.com/isaacs/cssmin/
+
+
+Copyright and License
+~~~~~~~~~~~~~~~~~~~~~
+
+Copyright 2011 - 2015
+André Malo or his licensors, as applicable.
+
+The whole package (except for the files in the bench/ directory)
+is distributed under the Apache License Version 2.0. You'll find a copy in the
+root directory of the distribution or online at:
+<http://www.apache.org/licenses/LICENSE-2.0>.
+
+
+Bugs
+~~~~
+
+No bugs, of course. ;-)
+But if you've found one or have an idea how to improve rcssmin, feel free to
+send a pull request on `github <https://github.com/ndparker/rcssmin>`_ or
+send a mail to <rcssmin-bugs@perlig.de>.
+
+
+Author Information
+~~~~~~~~~~~~~~~~~~
+
+André "nd" Malo <nd perlig.de>
+GPG: 0x8103A37E
+
+
+    If God intended people to be naked, they would be born that way.
+    -- Oscar Wilde
 
 %package doc
 Summary: doc components for the rcssmin package.
@@ -54,7 +119,7 @@ license components for the rcssmin package.
 %package python
 Summary: python components for the rcssmin package.
 Group: Default
-Requires: rcssmin-python3
+Requires: rcssmin-python3 = %{version}-%{release}
 
 %description python
 python components for the rcssmin package.
@@ -64,6 +129,7 @@ python components for the rcssmin package.
 Summary: python3 components for the rcssmin package.
 Group: Default
 Requires: python3-core
+Provides: pypi(rcssmin)
 
 %description python3
 python3 components for the rcssmin package.
@@ -71,21 +137,30 @@ python3 components for the rcssmin package.
 
 %prep
 %setup -q -n rcssmin-1.0.6
+cd %{_builddir}/rcssmin-1.0.6
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1532377702
-python3 setup.py build -b py3
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1583218385
+# -Werror is for werrorists
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$CFLAGS -fno-lto "
+export FFLAGS="$CFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
+export MAKEFLAGS=%{?_smp_mflags}
+python3 setup.py build
 
 %install
+export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/share/doc/rcssmin
-cp LICENSE %{buildroot}/usr/share/doc/rcssmin/LICENSE
-cp bench/LICENSE.cssmin %{buildroot}/usr/share/doc/rcssmin/bench_LICENSE.cssmin
-python3 -tt setup.py build -b py3 install --root=%{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/rcssmin
+cp %{_builddir}/rcssmin-1.0.6/LICENSE %{buildroot}/usr/share/package-licenses/rcssmin/7df059597099bb7dcf25d2a9aedfaf4465f72d8d
+cp %{_builddir}/rcssmin-1.0.6/bench/LICENSE.cssmin %{buildroot}/usr/share/package-licenses/rcssmin/2c0343517b99ae17764c408b6313ea09d921a856
+python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
 echo ----[ mark ]----
@@ -98,9 +173,9 @@ echo ----[ mark ]----
 %doc /usr/share/doc/rcssmin/*
 
 %files license
-%defattr(-,root,root,-)
-/usr/share/doc/rcssmin/LICENSE
-/usr/share/doc/rcssmin/bench_LICENSE.cssmin
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/rcssmin/2c0343517b99ae17764c408b6313ea09d921a856
+/usr/share/package-licenses/rcssmin/7df059597099bb7dcf25d2a9aedfaf4465f72d8d
 
 %files python
 %defattr(-,root,root,-)
