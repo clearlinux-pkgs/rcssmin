@@ -4,7 +4,7 @@
 #
 Name     : rcssmin
 Version  : 1.0.6
-Release  : 20
+Release  : 21
 URL      : https://files.pythonhosted.org/packages/e2/5f/852be8aa80d1c24de9b030cdb6532bc7e7a1c8461554f6edbe14335ba890/rcssmin-1.0.6.tar.gz
 Source0  : https://files.pythonhosted.org/packages/e2/5f/852be8aa80d1c24de9b030cdb6532bc7e7a1c8461554f6edbe14335ba890/rcssmin-1.0.6.tar.gz
 Summary  : CSS Minifier
@@ -16,89 +16,20 @@ Requires: rcssmin-python3 = %{version}-%{release}
 BuildRequires : buildreq-distutils3
 
 %description
-==============
- CSS Minifier
-==============
-
-RCSSmin is a CSS minifier.
-
-The minifier is based on the semantics of the `YUI compressor`_\, which itself
-is based on `the rule list by Isaac Schlueter`_\.
-
-This module is a re-implementation aiming for speed instead of maximum
-compression, so it can be used at runtime (rather than during a preprocessing
-step). RCSSmin does syntactical compression only (removing spaces, comments
-and possibly semicolons). It does not provide semantic compression (like
-removing empty blocks, collapsing redundant properties etc). It does, however,
-support various CSS hacks (by keeping them working as intended).
-
-Here's a feature list:
-
-- Strings are kept, except that escaped newlines are stripped
-- Space/Comments before the very end or before various characters are
-  stripped: ``:{});=>],!`` (The colon (``:``) is a special case, a single
-  space is kept if it's outside a ruleset.)
-- Space/Comments at the very beginning or after various characters are
-  stripped: ``{}(=:>[,!``
-- Optional space after unicode escapes is kept, resp. replaced by a simple
-  space
-- whitespaces inside ``url()`` definitions are stripped
-- Comments starting with an exclamation mark (``!``) can be kept optionally.
-- All other comments and/or whitespace characters are replaced by a single
-  space.
-- Multiple consecutive semicolons are reduced to one
-- The last semicolon within a ruleset is stripped
-- CSS Hacks supported:
-
-  - IE7 hack (``>/**/``)
-  - Mac-IE5 hack (``/*\*/.../**/``)
-  - The boxmodelhack is supported naturally because it relies on valid CSS2
-    strings
-  - Between ``:first-line`` and the following comma or curly brace a space is
-    inserted. (apparently it's needed for IE6)
-  - Same for ``:first-letter``
-
-rcssmin.c is a reimplementation of rcssmin.py in C and improves runtime up to
-factor 100 or so (depending on the input). docs/BENCHMARKS in the source
-distribution contains the details.
-
-Both python 2 (>= 2.4) and python 3 are supported.
-
-.. _YUI compressor: https://github.com/yui/yuicompressor/
-
-.. _the rule list by Isaac Schlueter: https://github.com/isaacs/cssmin/
-
-
-Copyright and License
-~~~~~~~~~~~~~~~~~~~~~
-
-Copyright 2011 - 2015
-André Malo or his licensors, as applicable.
-
-The whole package (except for the files in the bench/ directory)
-is distributed under the Apache License Version 2.0. You'll find a copy in the
-root directory of the distribution or online at:
-<http://www.apache.org/licenses/LICENSE-2.0>.
-
-
-Bugs
-~~~~
-
-No bugs, of course. ;-)
-But if you've found one or have an idea how to improve rcssmin, feel free to
-send a pull request on `github <https://github.com/ndparker/rcssmin>`_ or
-send a mail to <rcssmin-bugs@perlig.de>.
-
-
-Author Information
-~~~~~~~~~~~~~~~~~~
-
-André "nd" Malo <nd perlig.de>
-GPG: 0x8103A37E
-
-
-    If God intended people to be naked, they would be born that way.
-    -- Oscar Wilde
+CSS Minifier
+        ==============
+        
+        RCSSmin is a CSS minifier.
+        
+        The minifier is based on the semantics of the `YUI compressor`_\, which itself
+        is based on `the rule list by Isaac Schlueter`_\.
+        
+        This module is a re-implementation aiming for speed instead of maximum
+        compression, so it can be used at runtime (rather than during a preprocessing
+        step). RCSSmin does syntactical compression only (removing spaces, comments
+        and possibly semicolons). It does not provide semantic compression (like
+        removing empty blocks, collapsing redundant properties etc). It does, however,
+        support various CSS hacks (by keeping them working as intended).
 
 %package doc
 Summary: doc components for the rcssmin package.
@@ -144,12 +75,11 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1583218385
-# -Werror is for werrorists
+export SOURCE_DATE_EPOCH=1603403257
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -fno-lto "
-export FCFLAGS="$CFLAGS -fno-lto "
-export FFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$FFLAGS -fno-lto "
+export FFLAGS="$FFLAGS -fno-lto "
 export CXXFLAGS="$CXXFLAGS -fno-lto "
 export MAKEFLAGS=%{?_smp_mflags}
 python3 setup.py build
