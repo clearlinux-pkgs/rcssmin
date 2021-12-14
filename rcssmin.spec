@@ -4,7 +4,7 @@
 #
 Name     : rcssmin
 Version  : 1.1.0
-Release  : 33
+Release  : 34
 URL      : https://files.pythonhosted.org/packages/1e/e1/1386510c336541857aa28f8a0bb1514f15f557eb6037ddd61d1dd09c14ec/rcssmin-1.1.0.tar.gz
 Source0  : https://files.pythonhosted.org/packages/1e/e1/1386510c336541857aa28f8a0bb1514f15f557eb6037ddd61d1dd09c14ec/rcssmin-1.1.0.tar.gz
 Summary  : CSS Minifier
